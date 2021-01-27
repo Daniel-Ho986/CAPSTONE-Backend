@@ -28,6 +28,10 @@ const User = db.define("fitness", {
     BMI:{
         type: Sequelize.DOUBLE,
         defaultValue: 0,
+    },
+    exercise:{
+        type: Sequelize.DataTypes.ARRAY(Sequelize.DataTypes.STRING),
+        defaultValue: [1,2,3]
     }
 
 });

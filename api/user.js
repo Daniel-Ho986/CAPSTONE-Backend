@@ -1,5 +1,6 @@
 const router = require("express").Router();
-const { User } = require("../db/models");
+const axios = require("axios");
+const { User, Plan} = require("../db/models");
 
 //get all users path localhost:8080/api/user
 router.get('/', async(req,res,next)=>{
@@ -12,6 +13,17 @@ router.get('/', async(req,res,next)=>{
 		next(error);
 	}
 
+})
+//get plan for depending on bmi. place name of bmi class at :id, 
+router.get('/exercise/:id',async(req, res, next)=>{
+	try {
+		const plan = await Plan.findAll({where:{ BMIClass: req.params.id}});
+		res.json(plan);
+		
+	} catch (error) {
+		console.error(error);
+		next(error);
+	}
 })
 
 //get by id path localhost:8080/api/user/:id
@@ -52,7 +64,8 @@ router.put('/:id', async(req,res,next)=>{
 				lastName: req.body.lastName,
 				email: req.body.email,
 				weight: req.body.weight,
-				BMI: req.body.BMI
+				BMI: req.body.BMI,
+				exercise: req.body.exercise
 			})
 			res.json(user);
 		}
