@@ -1,34 +1,76 @@
 const express = require("express");
-const app = express();
-const axios = require("axios");
+const session = require("express-session");
+const passport = require("passport");
+const authRouter = require("./auth");
+const apiRouter = require("./api");
 const cors = require("cors");
+
+
+const SequelizeStore = require("connect-session-sequelize")(session.Store);
 const db = require("./db");
-require('dotenv').config();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const sessionStore = new SequelizeStore({ db });
 
-app.use(cors());
+const app = express();
 
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await db.models.user.findByPk(id);
+    done(null, user);
+  }
+  catch (err) {
+    done(err);
+  }
+});
 
+const syncDb = async () => {
+  await db.sync({ alter: true });
+}
 
-//API Routes
-app.use("/api", require("./api"));
+const configureApp = () => {
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
-//Start Up Function with node server.js
-const startUp = () => {
-	const server = app.listen(8080, () => {
-		console.log("I am listening for database");
-	});
-};
+  app.use(cors({ credentials: true, origin: 'http://localhost:3000' }))
 
-//DB Sync Function
-//Optional parameters
-// {force:true} - drops current tables and places new empty tables
-//{alter:true} - This checks what is the current state of the table in the database (which columns it has, what are their data types, etc), and then performs the necessary changes in the table to make it match the model.
+  /*
+  
+  app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.header("Access-Control-Allow-Credentials", true);
+    next();
+  });
+  */
 
-const syncDb = () => db.sync({alter:true});
-// Connects to //postgres://localhost:5432/pokemonlive
+  app.use(
+    session({
+      secret: "a super secretive secret key string to encrypt and sign the cookie",
+      store: sessionStore,
+      resave: false,
+      saveUninitialized: false
+    })
+  );
 
-//Run server and sync DB
-startUp();
-syncDb();
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  app.use("/auth", authRouter);
+  app.use("/api", apiRouter);
+}
+
+const startListening = () => {
+  const PORT = 5000;
+  app.listen(PORT, () => {
+    console.log(`Listening on port ${PORT}!!!`);
+  })
+}
+
+const bootApp = async () => {
+  await sessionStore.sync();
+  await syncDb();
+  await configureApp();
+  await startListening();
+}
+
+bootApp();
