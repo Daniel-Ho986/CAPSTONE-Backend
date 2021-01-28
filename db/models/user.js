@@ -27,22 +27,22 @@ const User = db.define("player", {
         type: Sequelize.STRING,
         unique: true,
         allowNull: false
-      },
-      password: {
+    },
+    password: {
         type: Sequelize.STRING,
         get() {
           return () => this.getDataValue("password");
         }
-      },
-      salt: {
+    },
+    salt: {
         type: Sequelize.STRING,
         get() {
           return () => this.getDataValue("salt");
         }
-      },
-      googleId: {
+    },
+    googleId: {
         type: Sequelize.STRING
-      }
+    }
 });
 User.generateSalt = function() {
     return crypto.randomBytes(16).toString("base64");
