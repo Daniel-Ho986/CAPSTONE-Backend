@@ -1,3 +1,4 @@
+const { INTEGER } = require('sequelize');
 const Sequelize = require('sequelize');
 
 const db = require('../db');
@@ -20,10 +21,13 @@ const User = db.define("fitness", {
         allowNull: false,
 
     },
-    weight :{
+    height :{
         type: Sequelize.INTEGER,
         defaultValue: 0,
         allowNull: false,
+    },
+    weight :{
+        type: Sequelize.DataTypes.ARRAY(Sequelize.DataTypes.INTEGER),
     },
     BMI:{
         type: Sequelize.DOUBLE,
@@ -31,7 +35,7 @@ const User = db.define("fitness", {
     },
     exercise:{
         type: Sequelize.DataTypes.ARRAY(Sequelize.DataTypes.STRING),
-        defaultValue: [1,2,3]
+        defaultValue: [1,2,3],
     }
 
 });
