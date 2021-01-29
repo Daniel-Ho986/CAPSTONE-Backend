@@ -14,10 +14,11 @@ router.get('/', async(req,res,next)=>{
 	}
 
 })
-//get plan for depending on bmi. place name of bmi class at :id, 
-router.get('/exercise/:id',async(req, res, next)=>{
+//get plan for depending on bmi. place name of bmi class at :id,
+//same as get :id in fitnessPlan path
+router.get('/exercise/:plan',async(req, res, next)=>{
 	try {
-		const plan = await Plan.findAll({where:{ BMIClass: req.params.id}});
+		const plan = await Plan.findAll({where:{ BMIClass: req.params.plan}});
 		res.json(plan);
 		
 	} catch (error) {
@@ -26,9 +27,9 @@ router.get('/exercise/:id',async(req, res, next)=>{
 	}
 })
 //get by email path localhost:8080/api/user/:id
-router.get('/:id', async(req,res,next)=>{
+router.get('/:email', async(req,res,next)=>{
 	try {
-		const user = await User.findOne({where: {email: req.params.id}});
+		const user = await User.findOne({where: {email: req.params.email}});
 		if(user === null)
 			res.json({message:"no user by this ID"})
 		else
@@ -41,21 +42,6 @@ router.get('/:id', async(req,res,next)=>{
 
 })
 
-//get by id path localhost:8080/api/user/:id
-router.get('/:id', async(req,res,next)=>{
-	try {
-		const user = await User.findByPk(req.params.id);
-		if(user === null)
-			res.json({message:"no user by this ID"})
-		else
-			res.json(user);
-		
-	} catch (error) {
-		console.error(error);
-		next(error);
-	}
-
-})
 
 //create new user localhost:8080/api/user
 //only an email is required. runs in frontend if firebase auth goes through
@@ -82,6 +68,7 @@ router.put('/:id', async(req,res,next)=>{
 				lastName: req.body.lastName,
 				email: req.body.email,
 				weight: req.body.weight,
+				height: req.body.height,
 				BMI: req.body.BMI,
 				exercise: req.body.exercise
 			})
