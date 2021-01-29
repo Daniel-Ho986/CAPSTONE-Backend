@@ -25,6 +25,21 @@ router.get('/exercise/:id',async(req, res, next)=>{
 		next(error);
 	}
 })
+//get by email path localhost:8080/api/user/:id
+router.get('/:id', async(req,res,next)=>{
+	try {
+		const user = await User.findOne({where: {email: req.params.id}});
+		if(user === null)
+			res.json({message:"no user by this ID"})
+		else
+			res.json(user);
+		
+	} catch (error) {
+		console.error(error);
+		next(error);
+	}
+
+})
 
 //get by id path localhost:8080/api/user/:id
 router.get('/:id', async(req,res,next)=>{
@@ -41,7 +56,9 @@ router.get('/:id', async(req,res,next)=>{
 	}
 
 })
+
 //create new user localhost:8080/api/user
+//only an email is required. runs in frontend if firebase auth goes through
 router.post('/', async(req,res,next)=>{
 	try {
 		const newUser = await User.create(req.body);
@@ -53,9 +70,10 @@ router.post('/', async(req,res,next)=>{
 	}
 })
 //update user info path localhost:8080/api/user/:id
+//:id will be email. this finds by email
 router.put('/:id', async(req,res,next)=>{
 	try {
-		let user = await User.findByPk(req.params.id);
+		let user = await User.findOne({where: {email: req.params.id}});
 		if(user === null)
 			res.json({message:"no user by this ID"})
 		else{
