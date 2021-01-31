@@ -27,7 +27,9 @@ const User = db.define("fitness", {
         allowNull: false,
     },
     weight :{
-        type: Sequelize.DataTypes.ARRAY(Sequelize.DataTypes.INTEGER),
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
     },
     BMI:{
         type: Sequelize.DOUBLE,
